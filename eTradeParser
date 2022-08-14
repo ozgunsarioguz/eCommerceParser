@@ -1,0 +1,47 @@
+from bs4 import BeautifulSoup as soup
+import urllib.request
+
+with urllib.request.urlopen("E_TRADING_SITE_URL") as url:
+
+    #opening up connection grabbing the page, parsing the page
+    page_html = url.read()
+    print(page_html)
+    url.close()
+
+page_soup = soup(page_html, "html.parser")
+
+#x = input("Please write.")
+page_soup.h1
+
+#grabs each component
+components = page_soup.findAll("span", {"data-component-type":"s-product-image"})
+prices = page_soup.findAll("span", {"class":"a-price-whole"})
+#components_dict = {}
+title_list = []
+brand_list = []
+price_list = []
+comp_list = []
+
+for component in components:
+    brand = component.a.div.img["alt"].split()[0]
+    title = component.a.div.img["alt"]
+    #components_dict[title] = brand
+    title_list.append(component.a.div.img["alt"])
+    brand_list.append(component.a.div.img["alt"].split()[0])
+
+for price in prices:
+    price_list.append(price.contents[0])
+
+#print(title_list, price_list)
+
+filename = "components.csv"
+f = open(filename, "w")
+headers = "brand, title, price"
+f.write(headers + "\n" )
+
+for i in range(len(price_list)):
+    comp_list.append([brand_list[i], title_list[i], price_list[i]])
+    f.write(brand_list[i] + "," + title_list[i].replace(",", " ") + "," + price_list[i])
+#print(components_dict)
+
+print(comp_list)
